@@ -159,6 +159,5 @@ http://localhost:8080
 - Overall, SkillCraft.ai showcases how AI can transform learning into an **interactive, personalized, and project-based experience**.
 
 # 🔗 Project Links
-
-🌐 Live Demo: https://skillcraft.ai  
+ 
 📦 GitHub Repository: https://github.com/krunalborad/skillCraft.ai
