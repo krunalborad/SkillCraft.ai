@@ -160,4 +160,4 @@ http://localhost:8080
 
 # 🔗 Project Links
  
-📦 GitHub Repository: https://github.com/krunalborad/skillCraft.ai
+### 🌐 Live Demo: https://tanstack-start-app.krunalborad06.workers.dev
