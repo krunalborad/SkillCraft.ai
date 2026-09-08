@@ -4,6 +4,8 @@ import { Sparkles, Loader2, CheckCircle2, XCircle, RefreshCw, Trophy } from "luc
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/quiz")({
   head: () => ({
@@ -23,10 +25,12 @@ type Question = {
 };
 
 function QuizPage() {
+  const { user } = useAuth();
   const [topic, setTopic] = useState("");
   const [difficulty, setDifficulty] = useState<"beginner" | "intermediate" | "advanced">("intermediate");
   const [count, setCount] = useState(5);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [submitted, setSubmitted] = useState(false);
@@ -63,6 +67,36 @@ function QuizPage() {
 
   const score = questions.reduce((acc, q, i) => acc + (answers[i] === q.correctIndex ? 1 : 0), 0);
   const allAnswered = questions.length > 0 && questions.every((_, i) => answers[i] !== undefined);
+
+  const submit = async () => {
+    setSubmitted(true);
+    if (!user) return;
+    const xpEarned = score * 5;
+    setSaving(true);
+    try {
+      const { error } = await supabase.from("quiz_attempts").insert({
+        user_id: user.id,
+        topic: topic.trim() || "General",
+        difficulty,
+        total: questions.length,
+        correct: score,
+        xp_earned: xpEarned,
+      });
+      if (error) throw error;
+      if (xpEarned > 0) {
+        const { data: prof } = await supabase.from("profiles").select("xp").eq("user_id", user.id).maybeSingle();
+        if (prof) await supabase.from("profiles").update({ xp: (prof.xp ?? 0) + xpEarned }).eq("user_id", user.id);
+        toast.success(`Quiz saved · +${xpEarned} XP`);
+      } else {
+        toast.success("Quiz saved to your dashboard");
+      }
+    } catch {
+      toast.error("Couldn't save this quiz result");
+    } finally {
+      setSaving(false);
+    }
+  };
+
 
   return (
     <div className="relative">
@@ -172,8 +206,8 @@ function QuizPage() {
             ))}
 
             {!submitted ? (
-              <Button variant="hero" size="lg" className="w-full" disabled={!allAnswered} onClick={() => setSubmitted(true)}>
-                {allAnswered ? "Submit answers" : `Answer all ${questions.length} questions to submit`}
+              <Button variant="hero" size="lg" className="w-full" disabled={!allAnswered || saving} onClick={submit}>
+                {allAnswered ? (saving ? "Saving…" : "Submit answers") : `Answer all ${questions.length} questions to submit`}
               </Button>
             ) : (
               <div className="rounded-2xl bg-gradient-card border border-primary/40 p-6 text-center shadow-glow">
@@ -183,6 +217,9 @@ function QuizPage() {
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
                   {score === questions.length ? "Flawless. You're ready." : score >= questions.length * 0.7 ? "Solid run — review the misses." : "Worth another loop. Practice makes it stick."}
+                </p>
+                <p className="text-xs text-muted-foreground mt-3">
+                  {user ? "Saved to your dashboard." : "Sign in to save this score and earn XP on your dashboard."}
                 </p>
                 <Button variant="glow" className="mt-5" onClick={generate}>
                   <RefreshCw className="mr-1.5 h-4 w-4" /> New quiz
