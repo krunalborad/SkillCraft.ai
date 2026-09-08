@@ -10,9 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TutorRouteImport } from './routes/tutor'
+import { Route as ResumeRouteImport } from './routes/resume'
 import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PlaygroundRouteImport } from './routes/playground'
+import { Route as MockInterviewRouteImport } from './routes/mock-interview'
 import { Route as LearningPathRouteImport } from './routes/learning-path'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
@@ -26,9 +31,19 @@ const TutorRoute = TutorRouteImport.update({
   path: '/tutor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResumeRoute = ResumeRouteImport.update({
+  id: '/resume',
+  path: '/resume',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QuizRoute = QuizRouteImport.update({
   id: '/quiz',
   path: '/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlaygroundRoute = PlaygroundRouteImport.update({
@@ -36,9 +51,24 @@ const PlaygroundRoute = PlaygroundRouteImport.update({
   path: '/playground',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MockInterviewRoute = MockInterviewRouteImport.update({
+  id: '/mock-interview',
+  path: '/mock-interview',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LearningPathRoute = LearningPathRouteImport.update({
   id: '/learning-path',
   path: '/learning-path',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaderboardRoute = LeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsRoute = JobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -81,9 +111,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/jobs': typeof JobsRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/learning-path': typeof LearningPathRoute
+  '/mock-interview': typeof MockInterviewRoute
   '/playground': typeof PlaygroundRoute
+  '/pricing': typeof PricingRoute
   '/quiz': typeof QuizRoute
+  '/resume': typeof ResumeRoute
   '/tutor': typeof TutorRoute
   '/certificate/$slug': typeof CertificateSlugRoute
   '/courses/$slug': typeof CoursesSlugRouteWithChildren
@@ -94,9 +129,14 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/jobs': typeof JobsRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/learning-path': typeof LearningPathRoute
+  '/mock-interview': typeof MockInterviewRoute
   '/playground': typeof PlaygroundRoute
+  '/pricing': typeof PricingRoute
   '/quiz': typeof QuizRoute
+  '/resume': typeof ResumeRoute
   '/tutor': typeof TutorRoute
   '/certificate/$slug': typeof CertificateSlugRoute
   '/courses/$slug': typeof CoursesSlugRouteWithChildren
@@ -108,9 +148,14 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/jobs': typeof JobsRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/learning-path': typeof LearningPathRoute
+  '/mock-interview': typeof MockInterviewRoute
   '/playground': typeof PlaygroundRoute
+  '/pricing': typeof PricingRoute
   '/quiz': typeof QuizRoute
+  '/resume': typeof ResumeRoute
   '/tutor': typeof TutorRoute
   '/certificate/$slug': typeof CertificateSlugRoute
   '/courses/$slug': typeof CoursesSlugRouteWithChildren
@@ -123,9 +168,14 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/jobs'
+    | '/leaderboard'
     | '/learning-path'
+    | '/mock-interview'
     | '/playground'
+    | '/pricing'
     | '/quiz'
+    | '/resume'
     | '/tutor'
     | '/certificate/$slug'
     | '/courses/$slug'
@@ -136,9 +186,14 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/jobs'
+    | '/leaderboard'
     | '/learning-path'
+    | '/mock-interview'
     | '/playground'
+    | '/pricing'
     | '/quiz'
+    | '/resume'
     | '/tutor'
     | '/certificate/$slug'
     | '/courses/$slug'
@@ -149,9 +204,14 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/jobs'
+    | '/leaderboard'
     | '/learning-path'
+    | '/mock-interview'
     | '/playground'
+    | '/pricing'
     | '/quiz'
+    | '/resume'
     | '/tutor'
     | '/certificate/$slug'
     | '/courses/$slug'
@@ -163,9 +223,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
+  JobsRoute: typeof JobsRoute
+  LeaderboardRoute: typeof LeaderboardRoute
   LearningPathRoute: typeof LearningPathRoute
+  MockInterviewRoute: typeof MockInterviewRoute
   PlaygroundRoute: typeof PlaygroundRoute
+  PricingRoute: typeof PricingRoute
   QuizRoute: typeof QuizRoute
+  ResumeRoute: typeof ResumeRoute
   TutorRoute: typeof TutorRoute
   CertificateSlugRoute: typeof CertificateSlugRoute
   CoursesSlugRoute: typeof CoursesSlugRouteWithChildren
@@ -181,11 +246,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TutorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/resume': {
+      id: '/resume'
+      path: '/resume'
+      fullPath: '/resume'
+      preLoaderRoute: typeof ResumeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/quiz': {
       id: '/quiz'
       path: '/quiz'
       fullPath: '/quiz'
       preLoaderRoute: typeof QuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/playground': {
@@ -195,11 +274,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlaygroundRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mock-interview': {
+      id: '/mock-interview'
+      path: '/mock-interview'
+      fullPath: '/mock-interview'
+      preLoaderRoute: typeof MockInterviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/learning-path': {
       id: '/learning-path'
       path: '/learning-path'
       fullPath: '/learning-path'
       preLoaderRoute: typeof LearningPathRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs': {
+      id: '/jobs'
+      path: '/jobs'
+      fullPath: '/jobs'
+      preLoaderRoute: typeof JobsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -270,9 +370,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
+  JobsRoute: JobsRoute,
+  LeaderboardRoute: LeaderboardRoute,
   LearningPathRoute: LearningPathRoute,
+  MockInterviewRoute: MockInterviewRoute,
   PlaygroundRoute: PlaygroundRoute,
+  PricingRoute: PricingRoute,
   QuizRoute: QuizRoute,
+  ResumeRoute: ResumeRoute,
   TutorRoute: TutorRoute,
   CertificateSlugRoute: CertificateSlugRoute,
   CoursesSlugRoute: CoursesSlugRouteWithChildren,
