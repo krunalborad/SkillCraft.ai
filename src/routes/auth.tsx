@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { Brain, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 
@@ -11,7 +10,11 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — SkillCraft" },
-      { name: "description", content: "Sign in or create your SkillCraft account to track progress, earn certificates, and climb the leaderboard." },
+      {
+        name: "description",
+        content:
+          "Sign in or create your SkillCraft account to track progress, earn certificates, and climb the leaderboard.",
+      },
     ],
   }),
   component: AuthPage,
@@ -33,6 +36,7 @@ function AuthPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
+
     try {
       if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
@@ -43,10 +47,16 @@ function AuthPage() {
             data: { full_name: name },
           },
         });
+
         if (error) throw error;
+
         toast.success("Account created — welcome!");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
         if (error) throw error;
       }
     } catch (err: any) {
@@ -56,43 +66,26 @@ function AuthPage() {
     }
   }
 
-  async function google() {
-    setBusy(true);
-    const r = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/dashboard`,
-    });
-    if (r.error) {
-      toast.error(r.error.message ?? "Google sign-in failed");
-      setBusy(false);
-    }
-  }
-
   return (
     <div className="relative min-h-[80vh] flex items-center justify-center px-6 py-16">
       <div className="absolute -top-40 left-1/2 -translate-x-1/2 h-[40rem] w-[40rem] rounded-full bg-gradient-primary blur-[120px] opacity-30 pointer-events-none" />
+
       <div className="relative w-full max-w-md rounded-3xl bg-gradient-card border border-border/60 p-8 shadow-elegant">
         <Link to="/" className="inline-flex items-center gap-2 mb-6">
           <div className="h-9 w-9 rounded-xl bg-gradient-primary flex items-center justify-center shadow-glow">
             <Brain className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="font-display text-xl font-bold">SkillCraft<span className="text-gradient">.ai</span></span>
+
+          <span className="font-display text-xl font-bold">
+            SkillCraft<span className="text-gradient">.ai</span>
+          </span>
         </Link>
+
         <h1 className="font-display text-3xl font-bold tracking-tight">
           {mode === "signin" ? "Welcome back" : "Create your account"}
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {mode === "signin" ? "Sign in to continue learning." : "Start tracking progress, streaks, and certificates."}
-        </p>
 
-        <Button variant="glow" className="w-full mt-6" onClick={google} disabled={busy}>
-          Continue with Google
-        </Button>
-
-        <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
-          <div className="h-px flex-1 bg-border/60" /> or email <div className="h-px flex-1 bg-border/60" />
-        </div>
-
-        <form onSubmit={submit} className="space-y-3">
+        <form onSubmit={submit} className="space-y-3 mt-6">
           {mode === "signup" && (
             <input
               required
@@ -102,6 +95,7 @@ function AuthPage() {
               className="w-full bg-input border border-border/60 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary/60"
             />
           )}
+
           <input
             required
             type="email"
@@ -110,6 +104,7 @@ function AuthPage() {
             onChange={(e) => setEmail(e.target.value)}
             className="w-full bg-input border border-border/60 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary/60"
           />
+
           <input
             required
             minLength={6}
@@ -119,18 +114,30 @@ function AuthPage() {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full bg-input border border-border/60 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary/60"
           />
-          <Button variant="hero" type="submit" className="w-full" disabled={busy}>
-            {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+
+          <Button
+            variant="hero"
+            type="submit"
+            className="w-full"
+            disabled={busy}
+          >
+            {busy && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
             {mode === "signin" ? "Sign in" : "Create account"}
           </Button>
         </form>
 
         <button
           type="button"
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+          onClick={() =>
+            setMode(mode === "signin" ? "signup" : "signin")
+          }
           className="mt-5 text-sm text-muted-foreground hover:text-foreground w-full text-center"
         >
-          {mode === "signin" ? "New here? Create an account" : "Already have an account? Sign in"}
+          {mode === "signin"
+            ? "New here? Create an account"
+            : "Already have an account? Sign in"}
         </button>
       </div>
     </div>
