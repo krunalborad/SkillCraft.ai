@@ -38,14 +38,15 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-display text-sm font-semibold mb-4">Company</h4>
+            <h4 className="font-display text-sm font-semibold mb-4">Career</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-foreground">About</a></li>
-              <li><a href="#" className="hover:text-foreground">Careers</a></li>
-              <li><a href="#" className="hover:text-foreground">Blog</a></li>
-              <li><a href="#" className="hover:text-foreground">Contact</a></li>
+              <li><Link to="/mock-interview" className="hover:text-foreground">Mock Interview</Link></li>
+              <li><Link to="/resume" className="hover:text-foreground">Resume Builder</Link></li>
+              <li><Link to="/jobs" className="hover:text-foreground">Jobs &amp; Internships</Link></li>
+              <li><Link to="/leaderboard" className="hover:text-foreground">Leaderboard</Link></li>
             </ul>
           </div>
+
         </div>
 
         <div className="mt-12 pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-4">
