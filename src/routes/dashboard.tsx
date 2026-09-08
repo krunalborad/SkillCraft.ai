@@ -26,15 +26,19 @@ function Dashboard() {
   const [weekly, setWeekly] = useState<{ label: string; count: number }[]>([]);
   const [resume, setResume] = useState<{ courseSlug: string; courseTitle: string; lessonTitle: string; gradient: string } | null>(null);
   const [totalLessons, setTotalLessons] = useState(0);
+  const [quizzes, setQuizzes] = useState<{ id: string; topic: string; difficulty: string; total: number; correct: number; created_at: string }[]>([]);
+  const [solved, setSolved] = useState<{ id: string; challenge_title: string; difficulty: string; language: string; xp_earned: number; solved_at: string }[]>([]);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [{ data: prof }, { data: prog }, { count }, { data: recent }] = await Promise.all([
+      const [{ data: prof }, { data: prog }, { count }, { data: recent }, { data: qz }, { data: sc }] = await Promise.all([
         supabase.from("profiles").select("display_name, xp, current_streak, longest_streak").eq("user_id", user.id).maybeSingle(),
         supabase.from("lesson_progress").select("course_slug, completed_at").eq("user_id", user.id),
         supabase.from("certificates").select("*", { count: "exact", head: true }).eq("user_id", user.id),
         supabase.from("lesson_progress").select("course_slug, lesson_id, completed_at").eq("user_id", user.id).order("completed_at", { ascending: false }).limit(1),
+        supabase.from("quiz_attempts").select("id, topic, difficulty, total, correct, created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(50),
+        supabase.from("solved_challenges").select("id, challenge_title, difficulty, language, xp_earned, solved_at").eq("user_id", user.id).order("solved_at", { ascending: false }).limit(50),
       ]);
       setProfile(prof as any);
       const counts: Record<string, number> = {};
@@ -42,8 +46,10 @@ function Dashboard() {
       setProgressByCourse(counts);
       setCertCount(count ?? 0);
       setTotalLessons((prog ?? []).length);
+      setQuizzes((qz ?? []) as any);
+      setSolved((sc ?? []) as any);
 
-      // Build last-7-days activity from completed_at timestamps
+      // Build last-7-days activity from all activity timestamps
       const today = new Date();
       const buckets: { label: string; count: number }[] = [];
       for (let i = 6; i >= 0; i--) {
@@ -55,8 +61,13 @@ function Dashboard() {
       const startOfWeek = new Date(today);
       startOfWeek.setDate(today.getDate() - 6);
       startOfWeek.setHours(0, 0, 0, 0);
-      (prog ?? []).forEach((p: any) => {
-        const dt = new Date(p.completed_at);
+      const stamps = [
+        ...(prog ?? []).map((p: any) => p.completed_at),
+        ...(qz ?? []).map((q: any) => q.created_at),
+        ...(sc ?? []).map((s: any) => s.solved_at),
+      ];
+      stamps.forEach((ts: string) => {
+        const dt = new Date(ts);
         const diff = Math.floor((dt.getTime() - startOfWeek.getTime()) / 86400000);
         if (diff >= 0 && diff < 7) buckets[diff].count += 1;
       });
@@ -97,6 +108,8 @@ function Dashboard() {
     { id: "unstoppable", label: "Unstoppable", desc: "30-day streak", icon: Trophy, earned: longest >= 30 },
     { id: "graduate", label: "Graduate", desc: "Earn your first certificate", icon: Award, earned: coursesCompleted >= 1 },
     { id: "polymath", label: "Polymath", desc: "Earn 3 certificates", icon: Star, earned: coursesCompleted >= 3 },
+    { id: "quizzer", label: "Quizzer", desc: "Complete 5 quizzes", icon: Target, earned: quizzes.length >= 5 },
+    { id: "coder", label: "Problem Solver", desc: "Solve 5 code challenges", icon: Brain, earned: solved.length >= 5 },
     { id: "xp-100", label: "Rising Star", desc: "Reach 100 XP", icon: Sparkles, earned: xp >= 100 },
     { id: "xp-1000", label: "XP Master", desc: "Reach 1,000 XP", icon: Trophy, earned: xp >= 1000 },
   ];
@@ -136,11 +149,13 @@ function Dashboard() {
       </section>
 
       <section className="pb-8">
-        <div className="mx-auto max-w-7xl px-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="mx-auto max-w-7xl px-6 grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {[
             { icon: Flame, label: "Day streak", value: String(profile?.current_streak ?? 0), trend: `Best: ${profile?.longest_streak ?? 0}d`, color: "text-warning" },
-            { icon: Sparkles, label: "Total XP", value: (profile?.xp ?? 0).toLocaleString(), trend: "+10 per lesson", color: "text-primary" },
+            { icon: Sparkles, label: "Total XP", value: (profile?.xp ?? 0).toLocaleString(), trend: "Lessons, quizzes & challenges", color: "text-primary" },
             { icon: Target, label: "Lessons done", value: String(Object.values(progressByCourse).reduce((a, b) => a + b, 0)), trend: `${inProgress.length} courses active`, color: "text-success" },
+            { icon: Brain, label: "Quizzes taken", value: String(quizzes.length), trend: quizzes.length ? `${Math.round((quizzes.reduce((a, q) => a + q.correct, 0) / Math.max(1, quizzes.reduce((a, q) => a + q.total, 0))) * 100)}% average` : "Try one today", color: "text-primary" },
+            { icon: Zap, label: "Challenges solved", value: String(solved.length), trend: solved.length ? `+${solved.reduce((a, s) => a + s.xp_earned, 0)} XP earned` : "Open Code Lab", color: "text-warning" },
             { icon: Award, label: "Certificates", value: String(certCount), trend: certCount ? "Earned" : "Complete a course", color: "text-accent" },
           ].map((s, i) => (
             <div key={i} className="rounded-2xl bg-gradient-card border border-border/60 p-5">
@@ -246,6 +261,57 @@ function Dashboard() {
           </div>
         </div>
       </section>
+
+      <section className="pb-8">
+        <div className="mx-auto max-w-7xl px-6 grid md:grid-cols-2 gap-6">
+          <div className="rounded-2xl bg-gradient-card border border-border/60 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-display text-lg font-bold">Recent quizzes</h2>
+              <Link to="/quiz" className="text-xs text-primary hover:underline">Take a quiz →</Link>
+            </div>
+            {quizzes.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No quizzes yet. Your scores will show up here after you submit one.</p>
+            ) : (
+              <div className="space-y-3">
+                {quizzes.slice(0, 5).map((q) => (
+                  <div key={q.id} className="flex items-center gap-3 rounded-xl border border-border/50 bg-secondary/20 p-3">
+                    <Target className="h-4 w-4 text-success flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-medium">{q.topic}</div>
+                      <div className="text-xs text-muted-foreground">{q.difficulty} · {new Date(q.created_at).toLocaleDateString()}</div>
+                    </div>
+                    <div className="font-mono text-sm">{q.correct}/{q.total}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-2xl bg-gradient-card border border-border/60 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-display text-lg font-bold">Solved challenges</h2>
+              <Link to="/playground" className="text-xs text-primary hover:underline">Open Code Lab →</Link>
+            </div>
+            {solved.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No challenges solved yet. Accepted solutions in Code Lab appear here with the XP they earned.</p>
+            ) : (
+              <div className="space-y-3">
+                {solved.slice(0, 5).map((s) => (
+                  <div key={s.id} className="flex items-center gap-3 rounded-xl border border-border/50 bg-secondary/20 p-3">
+                    <Zap className="h-4 w-4 text-warning flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-medium">{s.challenge_title}</div>
+                      <div className="text-xs text-muted-foreground">{s.difficulty} · {s.language} · {new Date(s.solved_at).toLocaleDateString()}</div>
+                    </div>
+                    <div className="font-mono text-sm text-primary">+{s.xp_earned}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
 
       <section className="pb-24">
         <div className="mx-auto max-w-7xl px-6">
