@@ -13,9 +13,13 @@ export function Header() {
     { to: "/learning-path", label: "AI Path" },
     { to: "/quiz", label: "Quiz" },
     { to: "/playground", label: "Code Lab" },
+    { to: "/mock-interview", label: "Interview" },
+    { to: "/resume", label: "Resume" },
+    { to: "/jobs", label: "Jobs" },
     { to: "/dashboard", label: "Dashboard" },
     { to: "/tutor", label: "AI Tutor" },
   ] as const;
+
 
   return (
     <header className="sticky top-0 z-50 w-full">
@@ -30,7 +34,7 @@ export function Header() {
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden lg:flex items-center gap-5">
           {nav.map((n) => (
             <Link
               key={n.to}
@@ -65,7 +69,7 @@ export function Header() {
           )}
         </div>
 
-        <button className="md:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
+        <button className="lg:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
