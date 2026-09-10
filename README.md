@@ -157,5 +157,6 @@ http://localhost:8080
 - Overall, SkillCraft.ai showcases how AI can transform learning into an **interactive, personalized, and project-based experience**.
 
 # 🔗 Project Links
- 
+
+### 🌐 Live Demo: https://skillcraftai-rosy.vercel.app
 ### 🌐 Live Demo: https://tanstack-start-app.krunalborad06.workers.dev
