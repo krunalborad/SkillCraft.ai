@@ -1,0 +1,18 @@
+project_id = "uryjzzoudqalmftakquw"
+[functions.ai-tutor]
+verify_jwt = false
+
+[functions.learning-path]
+verify_jwt = false
+
+[functions.quiz-generator]
+verify_jwt = false
+
+[functions.code-review]
+verify_jwt = false
+
+[functions.challenge-generator]
+verify_jwt = false
+
+[functions.challenge-judge]
+verify_jwt = false
